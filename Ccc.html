@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بانکداری سرور | نسخه پرمیوم</title>
+    <style>
+        :root {
+            --accent: #0062ff;
+            --dark-deep: #0a0f1d;
+            --glass: rgba(255, 255, 255, 0.9);
+            --grad: linear-gradient(135deg, #0041ff 0%, #001a5e 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #020617;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #1e293b;
+        }
+
+        .phone-shell {
+            width: 380px;
+            height: 800px;
+            background: #f1f5f9;
+            border-radius: 55px;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #1e293b;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+        }
+
+        /* --- صفحه ورود رسمی با اسکنر --- */
+        #loginPage {
+            position: absolute;
+            inset: 0;
+            background: var(--dark-deep);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .fingerprint-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 40px;
+        }
+
+        .fingerprint-svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 2;
+            opacity: 0.5;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 120%;
+            left: -10%;
+            height: 3px;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+            top: 0;
+            animation: scan 2.5s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 0%; }
+            50% { top: 100%; }
+        }
+
+        .login-form {
+            background: var(--glass);
+            width: 85%;
+            padding: 30px;
+            border-radius: 35px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        /* --- استایل داشبورد --- */
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: #f8fafc;
+        }
+
+        .active { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .header {
+            padding: 30px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+
+        /* کارت بانکی شیشه‌ای */
+        .balance-card {
+            background: var(--grad);
+            margin: 0 20px 25px;
+            padding: 40px 25px;
+            border-radius: 35px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,65,255,0.3);
+        }
+
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .bal-title { font-size: 13px; opacity: 0.7; margin-bottom: 8px; }
+        .bal-value { font-size: 28px; font-weight: bold; letter-spacing: 1px; }
+
+        /* گرید منو */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .menu-box {
+            background: white;
+            padding: 25px;
+            border-radius: 30px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        }
+
+        .menu-box:active { transform: scale(0.95); background: #f1f5f9; }
+
+        .icon-circle {
+            width: 50px;
+            height: 50px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+        }
+
+        /* اینپوت‌ها و دکمه‌ها */
+        input {
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 15px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            box-sizing: border-box;
+            outline: none;
+            background: #f8fafc;
+        }
+
+        .btn-prime {
+            width: 100%;
+            padding: 18px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,98,255,0.2);
+        }
+
+        .btn-back {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 15px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .receipt {
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            margin: 20px;
+            border: 2px dashed #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-shell">
+
+    <div id="loginPage">
+        <div class="fingerprint-wrapper">
+            <div class="scan-line"></div>
+            <svg class="fingerprint-svg" viewBox="0 0 24 24">
+                <path d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 .33.03.66.08.98.08.55.59.93 1.14.85.55-.08.93-.59.85-1.14A3.987 3.987 0 0110 13c0-1.1.9-2 2-2s2 .9 2 2c0 1.1-.9 2-2 2-.55 0-1 .45-1 1s.45 1 1 1c2.21 0 4-1.79 4-4zm-6-9c-4.97 0-9 4.03-9 9 0 .55.45 1 1 1s1-.45 1-1c0-3.87 3.13-7 7-7s7 3.13 7 7c0 .55.45 1 1 1s1-.45 1-1c0-4.97-4.03-9-9-9z"/>
+            </svg>
+        </div>
+        <div style="color: white; font-size: 24px; font-weight: bold; margin-bottom: 30px;">بانکداری سرور</div>
+        <div class="login-form">
+            <input type="text" id="uField" placeholder="نام کاربری">
+            <input type="password" id="pField" placeholder="رمز عبور">
+            <button class="btn-prime" onclick="handleAuth()">ورود به پنل مدیریت</button>
+            <p id="errLog" style="color: #ef4444; font-size: 12px; margin-top: 15px;"></p>
+        </div>
+    </div>
+
+    <div id="dash" class="page">
+        <div class="header">
+            <span style="font-weight: bold; color: var(--dark-deep);">پنل کاربری</span>
+            <button class="btn-back" onclick="location.reload()">خروج امن</button>
+        </div>
+        <div class="balance-card">
+            <div class="bal-title">موجودی کل (تومان)</div>
+            <div id="balText" class="bal-value">۰</div>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-box" onclick="navTo('cardP')"><div class="icon-circle">💳</div>کارت به کارت</div>
+            <div class="menu-box" onclick="navTo('shabaP')"><div class="icon-circle">🏦</div>شبا</div>
+            <div class="menu-box" onclick="navTo('topP')"><div class="icon-circle">💎</div>شارژ حساب</div>
+            <div class="menu-box" onclick="navTo('histP')"><div class="icon-circle">🕒</div>تاریخچه</div>
+        </div>
+    </div>
+
+    <div id="cardP" class="page">
+        <div class="header"><button class="btn-back" onclick="navTo('dash')">← برگشت</button> <strong>انتقال وجه</strong></div>
+        <div style="padding:25px;">
+            <input type="number" id="cNum" placeholder="شماره کارت مقصد">
+            <input type="number" id="cAmt" placeholder="مبلغ انتقال">
+            <button class="btn-prime" onclick="doCard()">تایید و ارسال</button>
+        </div>
+    </div>
+
+    <div id="shabaP" class="page">
+        <div class="header"><button class="btn-back" onclick="navTo('dash')">← برگشت</button> <strong>انتقال پایا</strong></div>
+        <div style="padding:25px;">
+            <p style="font-size: 11px; color:#64748b; margin-bottom:15px;">حداقل مبلغ انتقال شبا ۸۰۰ میلیون تومان است.</p>
+            <input type="text" id="sNum" placeholder="IR شماره شبا">
+            <input type="number" id="sAmt" placeholder="مبلغ">
+            <button class="btn-prime" id="sAction" onclick="doShaba()">ثبت حواله</button>
+            <div id="sWait" style="display:none; text-align:center; margin-top:15px; color:orange;">⏳ تاییدیه پایا...</div>
+        </div>
+    </div>
+
+    <div id="topP" class="page">
+        <div class="header"><button class="btn-back" onclick="navTo('dash')">← برگشت</button> <strong>افزایش موجودی</strong></div>
+        <div style="padding:25px;">
+            <input type="number" id="tNum" placeholder="شماره کارت">
+            <input type="number" id="tCvv" placeholder="CVV2">
+            <input type="number" id="tAmt" placeholder="مبلغ شارژ">
+            <button class="btn-prime" onclick="doTop()">پرداخت آنی</button>
+        </div>
+    </div>
+
+    <div id="histP" class="page">
+        <div class="header"><button class="btn-back" onclick="navTo('dash')">← برگشت</button> <strong>تراکنش‌ها</strong></div>
+        <div id="histContent" style="padding:20px; overflow-y:auto; height:70%;"></div>
+    </div>
+
+    <div id="recP" class="page">
+        <div class="header"><strong>رسید دیجیتال</strong></div>
+        <div id="recBody"></div>
+        <div style="padding:20px;"><button class="btn-prime" onclick="navTo('dash')">برگشت به خانه</button></div>
+    </div>
+
+</div>
+
+<script>
+    let bal = 0;
+    let logs = [];
+
+    function navTo(id) {
+        document.getElementById('loginPage').style.display = 'none';
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('balText').innerText = bal.toLocaleString('fa-IR');
+        if(id === 'histP') renderLogs();
+    }
+
+    function handleAuth() {
+        const u = document.getElementById('uField').value;
+        const p = document.getElementById('pField').value;
+        if ((u === 'admin123' && p === '123') || (u === 'eee' && p === '999')) {
+            navTo('dash');
+        } else {
+            document.getElementById('errLog').innerText = "مشخصات امنیتی نادرست است.";
+        }
+    }
+
+    function addLog(type, amt, desc) {
+        const time = new Date().toLocaleTimeString('fa-IR');
+        const entry = { type, amt, desc, time };
+        logs.unshift(entry);
+        document.getElementById('recBody').innerHTML = `
+            <div class="receipt">
+                <h3 style="color:green; text-align:center; margin-top:0;">تراکنش موفق</h3>
+                <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+                <p><b>نوع:</b> ${type}</p>
+                <p><b>مبلغ:</b> ${amt.toLocaleString()} تومان</p>
+                <p><b>جزئیات:</b> ${desc}</p>
+                <p><b>ساعت:</b> ${time}</p>
+            </div>
+        `;
+        navTo('recP');
+    }
+
+    function doCard() {
+        const a = parseInt(document.getElementById('cAmt').value);
+        if(a > bal) return alert("موجودی کافی نیست");
+        bal -= a;
+        addLog("کارت به کارت", a, "به کارت: " + document.getElementById('cNum').value);
+    }
+
+    function doShaba() {
+        const a = parseInt(document.getElementById('sAmt').value);
+        if(a < 800000000) return alert("حداقل مبلغ رعایت نشده است.");
+        if(a > bal) return alert("موجودی کافی نیست");
+        document.getElementById('sAction').style.display = 'none';
+        document.getElementById('sWait').style.display = 'block';
+        setTimeout(() => {
+            bal -= a;
+            addLog("انتقال شبا", a, "به شبا: " + document.getElementById('sNum').value);
+            document.getElementById('sAction').style.display = 'block';
+            document.getElementById('sWait').style.display = 'none';
+        }, 4000);
+    }
+
+    function doTop() {
+        const c = document.getElementById('tNum').value;
+        const v = document.getElementById('tCvv').value;
+        const a = parseInt(document.getElementById('tAmt').value);
+        if(c === '888' && v === '111') {
+            bal += a;
+            addLog("افزایش موجودی", a, "شارژ مستقیم حساب");
+        } else { alert("کارت بانکی تایید نشد."); }
+    }
+
+    function renderLogs() {
+        const c = document.getElementById('histContent');
+        if(logs.length === 0) { c.innerHTML = "<center color='#999'>تراکنشی یافت نشد</center>"; return; }
+        c.innerHTML = logs.map(l => `
+            <div style="background:white; padding:15px; border-radius:20px; margin-bottom:10px; display:flex; justify-content:space-between; border:1px solid #f0f0f0;">
+                <div style="text-align:right">
+                    <div style="font-weight:bold; font-size:13px;">${l.type}</div>
+                    <div style="font-size:10px; color:#888">${l.time}</div>
+                </div>
+                <div style="color:${l.type === 'افزایش موجودی' ? 'green' : 'red'}; font-weight:bold;">${l.amt.toLocaleString()}</div>
+            </div>
+        `).join('');
+    }
+</script>
+
+</body>
+</html>
